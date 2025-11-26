@@ -1,0 +1,401 @@
+
+
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Paper Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000000;
+            min-height: 100vh;
+            padding: 40px 20px;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .gradient-bg {
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3), transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(138, 43, 226, 0.2), transparent 50%),
+                        radial-gradient(circle at 40% 90%, rgba(72, 61, 139, 0.2), transparent 50%);
+            animation: gradientShift 15s ease infinite;
+            filter: blur(60px);
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(5%, -5%) rotate(120deg); }
+            66% { transform: translate(-5%, 5%) rotate(240deg); }
+        }
+
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+
+        .container {
+            background: rgba(15, 15, 15, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 32px;
+            padding: 60px 50px;
+            max-width: 650px;
+            width: 100%;
+            position: relative;
+            z-index: 10;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            color: #ffffff;
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -1.5px;
+            background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 15px;
+            font-weight: 400;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .progress-bar {
+            height: 2px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 2px;
+            margin: 30px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #fff, #888);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            color: #aaa;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            color: #ffffff;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%23ffffff' d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 20px center;
+            padding-right: 50px;
+        }
+     select option {
+    background: #0f0f0f;
+    color: #ffffff;
+    padding: 10px;
+}
+
+        button {
+            width: 100%;
+            padding: 20px;
+            background: #ffffff;
+            color: #000;
+            border: none;
+            border-radius: 16px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.4s;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 60px rgba(255, 255, 255, 0.2);
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .loader {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 30px;
+            border: 3px solid transparent;
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: rotate 1s linear infinite;
+        }
+
+        @keyframes rotate {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .loading-steps {
+            color: #666;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient-bg"></div>
+    <div class="grid-overlay"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1>Paperly AI</h1>
+            <p class="subtitle">Generate • Innovate • Publish</p>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <form id="paperForm">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="topic">Research Topic</label>
+                <textarea id="topic" placeholder="Describe your research vision..." required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="field">Field</label>
+                <select id="field" required>
+                    <option value="">Choose your domain</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Medicine">Medicine</option>
+                    <option value="Business">Business</option>
+                    <option value="Engineering">Engineering</option>
+                    <option value="Physics">Physics</option>
+                    <option value="Biology">Biology</option>
+                    <option value="Chemistry">Chemistry</option>
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="Psychology">Psychology</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="level">Level</label>
+                <select id="level" required>
+                    <option value="">Select academic tier</option>
+                    <option value="Undergraduate">Undergraduate</option>
+                    <option value="Masters">Masters</option>
+                    <option value="PhD">PhD</option>
+                    <option value="Journal">Journal</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="objectives">Objectives</label>
+                <textarea id="objectives" placeholder="What breakthrough are you pursuing?" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="keywords">Keywords</label>
+                <input type="text" id="keywords" placeholder="machine learning, neural networks, AI..." required>
+            </div>
+
+            <button type="submit">Generate Paper</button>
+        </form>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loader"></div>
+            <div class="loading-text">Generating Your Research Paper</div>
+            <div class="loading-steps" id="loadingSteps">Analyzing topic...</div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('paperForm');
+        const inputs = form.querySelectorAll('input, textarea, select');
+        const progressFill = document.getElementById('progressFill');
+
+        // Progress tracking
+        function updateProgress() {
+            let filled = 0;
+            inputs.forEach(input => {
+                if (input.value.trim() !== '') filled++;
+            });
+            const percentage = (filled / inputs.length) * 100;
+            progressFill.style.width = percentage + '%';
+        }
+
+        inputs.forEach(input => {
+            input.addEventListener('input', updateProgress);
+        });
+
+        // Loading steps
+        const loadingSteps = [
+    "🔍 Searching relevant papers from arXiv...",
+    "📄 Fetching most relevent research papers...",
+    "🧠 Extracting novelty from those papers",
+
+    "💡 Analyzing research gaps...",
+    "✨ Generating unique novelty contribution...",
+    "📝 Writing Introduction section...",
+    "🔎 Reviewing Introduction quality...",
+    "📚 Crafting Literature Review...",
+    "🔎 Reviewing Literature Review quality...",
+    "🔬 Designing Methodology section...",
+    "🔎 Reviewing Methodology quality...",
+    "🎯 Writing Conclusion section...",
+    "🔎 Reviewing Conclusion quality...",
+    "📋 Generating Abstract...",
+    "🏷️ Creating paper title...",
+    "✅ Finalizing research paper..."
+];
+
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = {
+                topic: document.getElementById('topic').value,
+                field: document.getElementById('field').value,
+                level: document.getElementById('level').value,
+                objectives: document.getElementById('objectives').value,
+                keywords: document.getElementById('keywords').value
+            };
+
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const stepsElement = document.getElementById('loadingSteps');
+            loadingOverlay.style.display = 'flex';
+
+            // Animate loading steps
+            let step = 0;
+            const stepInterval = setInterval(() => {
+                if (step < loadingSteps.length) {
+                    stepsElement.textContent = loadingSteps[step];
+                    step++;
+                }
+            }, 10000);
+
+            // Get CSRF token
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            // Backend call
+            fetch("/generate/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrftoken
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(res => res.json())
+            .then(data => {
+                clearInterval(stepInterval);
+                console.log("Response:", data);
+
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+
+                    if (data.status === "success") {
+                        // Save output to localStorage
+                        localStorage.setItem("paper_output", JSON.stringify(data.output));
+                        // Redirect to result page
+                        window.location.href = "/result/";
+                    } else {
+                        alert("Error: " + data.message);
+                    }
+                }, 1000);
+            })
+            .catch(err => {
+                clearInterval(stepInterval);
+                console.error("Error:", err);
+                loadingOverlay.style.display = 'none';
+                alert("Server error occurred! " + err);
+            });
+        });
+    </script>
+</body>
+</html>

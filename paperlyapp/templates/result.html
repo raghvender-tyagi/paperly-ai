@@ -1,0 +1,859 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Research Paper - Display</title>-->
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>-->
+<!--    <style>-->
+<!--        * {-->
+<!--            margin: 0;-->
+<!--            padding: 0;-->
+<!--            box-sizing: border-box;-->
+<!--        }-->
+
+<!--        body {-->
+<!--            font-family: 'Times New Roman', Times, serif;-->
+<!--            background: #ffffff;-->
+<!--            min-height: 100vh;-->
+<!--            padding: 0;-->
+<!--            position: relative;-->
+<!--            overflow-x: hidden;-->
+<!--            overflow-y: auto;-->
+<!--            color: #000;-->
+<!--        }-->
+
+<!--        /* Remove animated backgrounds */-->
+<!--        .gradient-bg,-->
+<!--        .grid-overlay {-->
+<!--            display: none;-->
+<!--        }-->
+
+<!--        .container {-->
+<!--            max-width: 210mm;-->
+<!--            margin: 0 auto;-->
+<!--            background: #ffffff;-->
+<!--            padding: 25mm 20mm;-->
+<!--            position: relative;-->
+<!--            z-index: 10;-->
+<!--            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);-->
+<!--            min-height: 297mm;-->
+<!--        }-->
+
+<!--        @keyframes pageAppear {-->
+<!--            from {-->
+<!--                opacity: 0;-->
+<!--                transform: translateY(30px);-->
+<!--            }-->
+<!--            to {-->
+<!--                opacity: 1;-->
+<!--                transform: translateY(0);-->
+<!--            }-->
+<!--        }-->
+
+<!--        /* Header section */-->
+<!--        .paper-header {-->
+<!--            text-align: center;-->
+<!--            margin-bottom: 40px;-->
+<!--            padding-bottom: 20px;-->
+<!--            border-top: 3px solid #000;-->
+<!--            border-bottom: 3px solid #000;-->
+<!--            padding-top: 15px;-->
+<!--        }-->
+
+<!--        .header-label {-->
+<!--            font-size: 11px;-->
+<!--            font-weight: bold;-->
+<!--            text-transform: uppercase;-->
+<!--            letter-spacing: 1px;-->
+<!--            margin-bottom: 15px;-->
+<!--            color: #000;-->
+<!--        }-->
+
+<!--        .paper-title {-->
+<!--            font-size: 16px;-->
+<!--            font-weight: bold;-->
+<!--            color: #000;-->
+<!--            margin-bottom: 25px;-->
+<!--            line-height: 1.4;-->
+<!--            text-transform: uppercase;-->
+<!--            letter-spacing: 0.5px;-->
+<!--        }-->
+
+<!--        .paper-meta {-->
+<!--            display: block;-->
+<!--            text-align: center;-->
+<!--            margin-top: 15px;-->
+<!--        }-->
+
+<!--        .author-block {-->
+<!--            margin-bottom: 8px;-->
+<!--            font-size: 13px;-->
+<!--            line-height: 1.5;-->
+<!--        }-->
+
+<!--        .author-name {-->
+<!--            font-weight: bold;-->
+<!--            font-style: italic;-->
+<!--        }-->
+
+<!--        .author-title,-->
+<!--        .author-affiliation {-->
+<!--            font-size: 12px;-->
+<!--            font-style: italic;-->
+<!--        }-->
+
+<!--        .meta-badge {-->
+<!--            display: none;-->
+<!--        }-->
+
+<!--        .meta-item {-->
+<!--            display: none;-->
+<!--        }-->
+
+<!--        /* Section styles */-->
+<!--        .section {-->
+<!--            margin-bottom: 50px;-->
+<!--            animation: sectionFade 0.8s ease-out backwards;-->
+<!--        }-->
+
+<!--        .section:nth-child(1) { animation-delay: 0.1s; }-->
+<!--        .section:nth-child(2) { animation-delay: 0.2s; }-->
+<!--        .section:nth-child(3) { animation-delay: 0.3s; }-->
+<!--        .section:nth-child(4) { animation-delay: 0.4s; }-->
+<!--        .section:nth-child(5) { animation-delay: 0.5s; }-->
+
+<!--        @keyframes sectionFade {-->
+<!--            from {-->
+<!--                opacity: 0;-->
+<!--                transform: translateY(20px);-->
+<!--            }-->
+<!--            to {-->
+<!--                opacity: 1;-->
+<!--                transform: translateY(0);-->
+<!--            }-->
+<!--        }-->
+
+<!--        .section-title {-->
+<!--            font-size: 13px;-->
+<!--            font-weight: bold;-->
+<!--            color: #000;-->
+<!--            margin-bottom: 10px;-->
+<!--            margin-top: 20px;-->
+<!--            text-transform: uppercase;-->
+<!--            border: none;-->
+<!--            display: block;-->
+<!--        }-->
+
+<!--        .section-title::after {-->
+<!--            display: none;-->
+<!--        }-->
+
+<!--        .section-content {-->
+<!--            color: #000;-->
+<!--            font-size: 12px;-->
+<!--            line-height: 1.6;-->
+<!--            text-align: justify;-->
+<!--            text-justify: inter-word;-->
+<!--        }-->
+
+<!--        .section-content p {-->
+<!--            margin-bottom: 12px;-->
+<!--            text-indent: 0;-->
+<!--        }-->
+
+<!--        /* Abstract section - special styling */-->
+<!--        .abstract-section {-->
+<!--            background: transparent;-->
+<!--            padding: 0;-->
+<!--            border: none;-->
+<!--            margin-bottom: 30px;-->
+<!--        }-->
+
+<!--        .abstract-section .section-title {-->
+<!--            margin-bottom: 10px;-->
+<!--            border: none;-->
+<!--        }-->
+
+<!--        .abstract-section .section-content {-->
+<!--            font-style: normal;-->
+<!--            color: #000;-->
+<!--            font-size: 11px;-->
+<!--            line-height: 1.5;-->
+<!--        }-->
+
+<!--        /* Keywords */-->
+<!--        .keywords {-->
+<!--            margin-top: 15px;-->
+<!--            padding: 0;-->
+<!--            background: transparent;-->
+<!--            border-radius: 0;-->
+<!--        }-->
+
+<!--        .keywords-title {-->
+<!--            font-size: 11px;-->
+<!--            font-weight: bold;-->
+<!--            color: #000;-->
+<!--            margin-bottom: 5px;-->
+<!--            text-transform: uppercase;-->
+<!--            letter-spacing: 0.5px;-->
+<!--        }-->
+
+<!--        .keywords-list {-->
+<!--            display: block;-->
+<!--            line-height: 1.5;-->
+<!--        }-->
+
+<!--        .keyword-tag {-->
+<!--            background: transparent;-->
+<!--            color: #000;-->
+<!--            padding: 0;-->
+<!--            border-radius: 0;-->
+<!--            font-size: 11px;-->
+<!--            border: none;-->
+<!--            font-weight: normal;-->
+<!--            font-style: italic;-->
+<!--            display: inline;-->
+<!--        }-->
+
+<!--        .keyword-tag:not(:last-child)::after {-->
+<!--            content: ', ';-->
+<!--        }-->
+
+<!--        /* Action buttons */-->
+<!--        .action-bar {-->
+<!--            position: fixed;-->
+<!--            bottom: 30px;-->
+<!--            right: 30px;-->
+<!--            display: flex;-->
+<!--            gap: 15px;-->
+<!--            z-index: 100;-->
+<!--        }-->
+
+<!--        .action-btn {-->
+<!--            background: #ffffff;-->
+<!--            border: 2px solid #667eea;-->
+<!--            color: #667eea;-->
+<!--            padding: 15px 25px;-->
+<!--            border-radius: 30px;-->
+<!--            font-size: 14px;-->
+<!--            font-weight: 600;-->
+<!--            cursor: pointer;-->
+<!--            transition: all 0.3s ease;-->
+<!--            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            gap: 8px;-->
+<!--            text-transform: uppercase;-->
+<!--            letter-spacing: 0.5px;-->
+<!--        }-->
+
+<!--        .action-btn:hover {-->
+<!--            background: #667eea;-->
+<!--            color: white;-->
+<!--            transform: translateY(-2px);-->
+<!--            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);-->
+<!--        }-->
+
+<!--        .action-btn svg {-->
+<!--            width: 18px;-->
+<!--            height: 18px;-->
+<!--        }-->
+
+<!--        /* Scroll progress bar */-->
+<!--        .progress-container {-->
+<!--            position: fixed;-->
+<!--            top: 0;-->
+<!--            left: 0;-->
+<!--            width: 100%;-->
+<!--            height: 3px;-->
+<!--            background: #e0e0e0;-->
+<!--            z-index: 1000;-->
+<!--        }-->
+
+<!--        .progress-bar {-->
+<!--            height: 100%;-->
+<!--            background: #000;-->
+<!--            width: 0%;-->
+<!--            transition: width 0.1s ease;-->
+<!--        }-->
+
+<!--        /* Custom scrollbar */-->
+<!--        body::-webkit-scrollbar {-->
+<!--            width: 10px;-->
+<!--        }-->
+
+<!--        body::-webkit-scrollbar-track {-->
+<!--            background: #f0f0f0;-->
+<!--        }-->
+
+<!--        body::-webkit-scrollbar-thumb {-->
+<!--            background: #888;-->
+<!--            border-radius: 5px;-->
+<!--        }-->
+
+<!--        body::-webkit-scrollbar-thumb:hover {-->
+<!--            background: #555;-->
+<!--        }-->
+
+<!--        /* Responsive */-->
+<!--        @media (max-width: 768px) {-->
+<!--            body {-->
+<!--                padding: 20px 10px;-->
+<!--            }-->
+
+<!--            .container {-->
+<!--                padding: 40px 30px;-->
+<!--            }-->
+
+<!--            .paper-title {-->
+<!--                font-size: 28px;-->
+<!--            }-->
+
+<!--            .section-title {-->
+<!--                font-size: 20px;-->
+<!--            }-->
+
+<!--            .section-content {-->
+<!--                font-size: 15px;-->
+<!--                text-align: left;-->
+<!--            }-->
+
+<!--            .action-bar {-->
+<!--                bottom: 15px;-->
+<!--                right: 15px;-->
+<!--                flex-direction: column;-->
+<!--            }-->
+
+<!--            .action-btn {-->
+<!--                padding: 12px 20px;-->
+<!--                font-size: 12px;-->
+<!--            }-->
+
+<!--            .paper-meta {-->
+<!--                flex-direction: column;-->
+<!--                gap: 10px;-->
+<!--            }-->
+<!--        }-->
+
+<!--        @media (max-width: 480px) {-->
+<!--            .container {-->
+<!--                padding: 30px 20px;-->
+<!--                border-radius: 0;-->
+<!--            }-->
+
+<!--            .paper-title {-->
+<!--                font-size: 24px;-->
+<!--            }-->
+
+<!--            .keywords-list {-->
+<!--                flex-direction: column;-->
+<!--            }-->
+<!--        }-->
+
+<!--        /* Print styles */-->
+<!--        @media print {-->
+<!--            body {-->
+<!--                background: white;-->
+<!--            }-->
+
+<!--            .gradient-bg,-->
+<!--            .grid-overlay,-->
+<!--            .action-bar,-->
+<!--            .progress-container {-->
+<!--                display: none;-->
+<!--            }-->
+
+<!--            .container {-->
+<!--                box-shadow: none;-->
+<!--                padding: 40px;-->
+<!--            }-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--    <div class="gradient-bg"></div>-->
+<!--    <div class="grid-overlay"></div>-->
+
+<!--    &lt;!&ndash; Scroll progress &ndash;&gt;-->
+<!--    <div class="progress-container">-->
+<!--        <div class="progress-bar" id="progressBar"></div>-->
+<!--    </div>-->
+
+<!--    <div class="container">-->
+<!--        &lt;!&ndash; Header &ndash;&gt;-->
+<!--        <div class="paper-header">-->
+<!--            <div class="header-label">Research Paper – <span id="paperField">Computer Science</span></div>-->
+<!--            <h1 class="paper-title" id="paperTitle">AN EMPIRICAL STUDY OF CONSUMER BEHAVIOR ON FINANCIAL DAILIES</h1>-->
+<!--            <div class="paper-meta">-->
+<!--                <div class="author-block">-->
+<!--                    <div class="author-name">Sunil Patil</div>-->
+<!--                    <div class="author-title">Research Scholar,</div>-->
+<!--                    <div class="author-affiliation">JJT University, Jhunjhunu, Rajasthan</div>-->
+<!--                </div>-->
+<!--                <div class="author-block">-->
+<!--                    <div class="author-name">Himanshu Rarot</div>-->
+<!--                    <div class="author-title">Research Scholar,</div>-->
+<!--                    <div class="author-affiliation">JJT University, Jhunjhunu, Rajasthan</div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; Abstract &ndash;&gt;-->
+<!--        <div class="abstract-section section">-->
+<!--            <h2 class="section-title">Abstract</h2>-->
+<!--            <div class="section-content" id="abstractContent">-->
+<!--                This is where the abstract will appear. The abstract provides a brief summary of the research paper, including the background, objectives, methodology, and key findings.-->
+<!--            </div>-->
+
+<!--            <div class="keywords">-->
+<!--                <div class="keywords-title">Keywords</div>-->
+<!--                <div class="keywords-list" id="keywordsList">-->
+<!--                    <span class="keyword-tag">Machine Learning</span>-->
+<!--                    <span class="keyword-tag">Artificial Intelligence</span>-->
+<!--                    <span class="keyword-tag">Neural Networks</span>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; Introduction &ndash;&gt;-->
+<!--        <div class="section">-->
+<!--            <h2 class="section-title">1. Introduction</h2>-->
+<!--            <div class="section-content" id="introductionContent">-->
+<!--                The introduction section will appear here. It sets the context for the research, identifies the problem, and outlines the objectives of the study.-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; Literature Review &ndash;&gt;-->
+<!--        <div class="section">-->
+<!--            <h2 class="section-title">2. Literature Review</h2>-->
+<!--            <div class="section-content" id="literatureContent">-->
+<!--                The literature review section will appear here. This section reviews existing research, identifies gaps, and positions the current study within the broader academic conversation.-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; Methodology &ndash;&gt;-->
+<!--        <div class="section">-->
+<!--            <h2 class="section-title">3. Methodology</h2>-->
+<!--            <div class="section-content" id="methodologyContent">-->
+<!--                The methodology section will appear here. It describes the research design, data collection methods, tools used, and analytical approaches employed in the study.-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; Conclusion &ndash;&gt;-->
+<!--        <div class="section">-->
+<!--            <h2 class="section-title">4. Conclusion</h2>-->
+<!--            <div class="section-content" id="conclusionContent">-->
+<!--                The conclusion section will appear here. It summarizes key findings, discusses implications, acknowledges limitations, and suggests directions for future research.-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; Action buttons &ndash;&gt;-->
+<!--    <div class="action-bar">-->
+<!--        <button class="action-btn" onclick="downloadPDF()">-->
+<!--            <svg fill="currentColor" viewBox="0 0 20 20">-->
+<!--                <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/>-->
+<!--            </svg>-->
+<!--            Download PDF-->
+<!--        </button>-->
+<!--        <button class="action-btn" onclick="window.print()">-->
+<!--            <svg fill="currentColor" viewBox="0 0 20 20">-->
+<!--                <path d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z"/>-->
+<!--            </svg>-->
+<!--            Print-->
+<!--        </button>-->
+<!--    </div>-->
+
+<!--    <script>-->
+<!--        // Sample data - Replace with your actual data-->
+<!--        const paperData = {-->
+<!--            title: "Advanced Machine Learning Techniques for Predictive Analytics",-->
+<!--            author: "Research Team",-->
+<!--            date: "November 2025",-->
+<!--            level: "PhD Level",-->
+<!--            field: "Computer Science",-->
+<!--            keywords: ["Machine Learning", "Artificial Intelligence", "Neural Networks", "Deep Learning", "Predictive Analytics"],-->
+<!--            abstract: "This research paper explores advanced machine learning techniques for predictive analytics. The study investigates novel approaches to enhance prediction accuracy and computational efficiency. Through comprehensive experimentation and analysis, we demonstrate significant improvements over traditional methods. The findings contribute to the growing body of knowledge in artificial intelligence and machine learning applications.",-->
+<!--            introduction: "In recent years, machine learning has emerged as a transformative force in data analysis and predictive modeling. The introduction of deep learning architectures has revolutionized how we approach complex problems across various domains. This paper addresses the critical need for more efficient and accurate predictive analytics systems.\n\nThe primary objective of this research is to develop and evaluate novel machine learning techniques that can handle large-scale data while maintaining high prediction accuracy. We focus on addressing current limitations in existing approaches and propose innovative solutions that leverage recent advances in neural network architectures.\n\nThis paper is structured as follows: Section 2 reviews relevant literature, Section 3 describes our methodology, and Section 4 presents our conclusions and future work directions.",-->
+<!--            literature_review: "The field of machine learning has witnessed tremendous growth over the past decade. Early work by researchers established fundamental principles that continue to guide current research. Recent studies have explored various aspects of deep learning, including convolutional neural networks, recurrent architectures, and attention mechanisms.\n\nSeveral researchers have investigated predictive analytics in different contexts. Their work has demonstrated the potential of machine learning techniques but also highlighted several limitations. Common challenges include computational complexity, data quality requirements, and interpretability concerns.\n\nGaps in existing research include limited exploration of hybrid approaches that combine multiple techniques, insufficient attention to scalability issues, and lack of comprehensive benchmarking across diverse datasets. Our research addresses these gaps by proposing novel architectures and conducting extensive experimental validation.",-->
+<!--            methodology: "Our research employs a mixed-methods approach combining quantitative analysis with qualitative insights. The study design incorporates both experimental and observational components to ensure comprehensive coverage of the research questions.\n\nData collection involved gathering datasets from multiple sources, including public repositories and proprietary databases. We established strict selection criteria to ensure data quality and relevance. The final dataset comprises over 1 million samples across various categories.\n\nWe developed custom neural network architectures incorporating attention mechanisms and residual connections. Training was conducted using state-of-the-art optimization techniques, with careful hyperparameter tuning through systematic grid search and cross-validation.\n\nPerformance evaluation utilized multiple metrics including accuracy, precision, recall, and F1-score. We conducted statistical significance testing to validate our findings and ensure reproducibility of results.",-->
+<!--            conclusion: "This research has successfully demonstrated the effectiveness of our proposed machine learning techniques for predictive analytics. The experimental results show significant improvements over baseline methods across multiple evaluation metrics.\n\nKey contributions of this work include: (1) development of novel neural network architectures, (2) comprehensive experimental validation across diverse datasets, (3) theoretical analysis of computational complexity, and (4) practical guidelines for implementation.\n\nLimitations of this study include reliance on specific dataset characteristics and potential challenges in generalizing to extremely large-scale applications. Future research should explore transfer learning approaches and investigate the integration of domain-specific knowledge.\n\nThe implications of this work extend beyond academic interest, offering practical benefits for real-world applications in healthcare, finance, and other domains requiring accurate predictive analytics."-->
+<!--        };-->
+
+<!--        // Populate the page with data-->
+<!--        function populatePaper() {-->
+<!--            document.getElementById('paperTitle').textContent = paperData.title;-->
+<!--            document.getElementById('paperDate').textContent = paperData.date;-->
+<!--            document.getElementById('paperLevel').textContent = paperData.level;-->
+
+<!--            document.getElementById('abstractContent').textContent = paperData.abstract;-->
+<!--            document.getElementById('introductionContent').textContent = paperData.introduction;-->
+<!--            document.getElementById('literatureContent').textContent = paperData.literature_review;-->
+<!--            document.getElementById('methodologyContent').textContent = paperData.methodology;-->
+<!--            document.getElementById('conclusionContent').textContent = paperData.conclusion;-->
+
+<!--            // Keywords-->
+<!--            const keywordsList = document.getElementById('keywordsList');-->
+<!--            keywordsList.innerHTML = '';-->
+<!--            paperData.keywords.forEach(keyword => {-->
+<!--                const tag = document.createElement('span');-->
+<!--                tag.className = 'keyword-tag';-->
+<!--                tag.textContent = keyword;-->
+<!--                keywordsList.appendChild(tag);-->
+<!--            });-->
+<!--        }-->
+
+<!--        // Scroll progress bar-->
+<!--        window.addEventListener('scroll', () => {-->
+<!--            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;-->
+<!--            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;-->
+<!--            const scrolled = (winScroll / height) * 100;-->
+<!--            document.getElementById('progressBar').style.width = scrolled + '%';-->
+<!--        });-->
+
+<!--        // Download PDF function - NOW WORKING!-->
+<!--        function downloadPDF() {-->
+<!--            const element = document.querySelector('.container');-->
+<!--            const actionBar = document.querySelector('.action-bar');-->
+<!--            const progressContainer = document.querySelector('.progress-container');-->
+
+<!--            // Hide buttons and progress bar before generating PDF-->
+<!--            actionBar.style.display = 'none';-->
+<!--            progressContainer.style.display = 'none';-->
+
+<!--            const opt = {-->
+<!--                margin: 0,-->
+<!--                filename: 'research_paper.pdf',-->
+<!--                image: { type: 'jpeg', quality: 0.98 },-->
+<!--                html2canvas: {-->
+<!--                    scale: 2,-->
+<!--                    useCORS: true,-->
+<!--                    letterRendering: true-->
+<!--                },-->
+<!--                jsPDF: {-->
+<!--                    unit: 'mm',-->
+<!--                    format: 'a4',-->
+<!--                    orientation: 'portrait'-->
+<!--                }-->
+<!--            };-->
+
+<!--            html2pdf().set(opt).from(element).save().then(() => {-->
+<!--                // Show buttons again after PDF is generated-->
+<!--                actionBar.style.display = 'flex';-->
+<!--                progressContainer.style.display = 'block';-->
+<!--            });-->
+<!--        }-->
+
+<!--        // Initialize-->
+<!--        populatePaper();-->
+<!--    </script>-->
+<!--</body>-->
+<!--</html>-->
+
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Paper - Result</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+   <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Times New Roman', Times, serif;
+        background: #ffffff;
+        padding: 40px 20px;
+        line-height: 1.6;
+    }
+
+    .container {
+        max-width: 850px;
+        margin: 0 auto;
+        background: #ffffff;
+        padding: 60px 80px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    .paper-header {
+        text-align: center;
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 3px double #000;
+    }
+
+    .paper-title {
+        color: #000000;
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        line-height: 1.3;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .paper-meta {
+        color: #333;
+        font-size: 13px;
+        margin-top: 10px;
+        font-style: italic;
+    }
+
+    .section {
+        margin-bottom: 30px;
+        page-break-inside: avoid;
+    }
+
+    .section-title {
+        color: #000000;
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 12px;
+        margin-top: 20px;
+        text-transform: uppercase;
+    }
+
+    .section-content {
+        color: #000;
+        font-size: 14px;
+        line-height: 1.8;
+        text-align: justify;
+        text-indent: 30px;
+    }
+
+    .section-content::first-line {
+        text-indent: 30px;
+    }
+
+    .keywords {
+        margin-top: 20px;
+        padding: 15px 0;
+        border-top: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .keywords-title {
+        color: #000;
+        font-size: 13px;
+        font-weight: bold;
+        margin-bottom: 8px;
+        display: inline;
+    }
+
+    .keywords-list {
+        display: inline;
+    }
+
+    .keyword-tag {
+        color: #000;
+        font-size: 13px;
+        font-style: italic;
+    }
+
+    .keyword-tag:not(:last-child)::after {
+        content: ", ";
+    }
+
+    .action-bar {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        display: flex;
+        gap: 15px;
+        z-index: 100;
+    }
+
+    .action-btn {
+        background: #000000;
+        color: #ffffff;
+        border: 2px solid #000;
+        padding: 12px 20px;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s;
+        font-family: Arial, sans-serif;
+    }
+
+    .action-btn:hover {
+        background: #ffffff;
+        color: #000000;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .action-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    @media print {
+        body {
+            padding: 0;
+        }
+        .action-bar {
+            display: none !important;
+        }
+        .container {
+            box-shadow: none;
+            padding: 40px;
+        }
+        .section {
+            page-break-inside: avoid;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 30px 20px;
+        }
+        .paper-title {
+            font-size: 20px;
+        }
+        .section-content {
+            font-size: 13px;
+            text-indent: 20px;
+        }
+        .action-bar {
+            bottom: 15px;
+            right: 15px;
+            flex-direction: column;
+        }
+    }
+</style>
+</head>
+<body>
+    <div class="gradient-bg"></div>
+
+    <div class="container">
+        <div class="paper-header">
+            <div class="paper-meta" id="paperField"></div>
+            <h1 class="paper-title" id="paperTitle">Loading...</h1>
+            <div class="paper-meta" id="paperLevel"></div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Abstract</h2>
+            <div class="section-content" id="abstractContent">Loading...</div>
+         <div class="keywords">
+    <div class="keywords-title">Keywords:</div>
+    <div class="keywords-list" id="keywordsList"></div>
+</div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">1. Introduction</h2>
+            <div class="section-content" id="introductionContent">Loading...</div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">2. Literature Review</h2>
+            <div class="section-content" id="literatureContent">Loading...</div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">3. Methodology</h2>
+            <div class="section-content" id="methodologyContent">Loading...</div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">4. Conclusion</h2>
+            <div class="section-content" id="conclusionContent">Loading...</div>
+        </div>
+    </div>
+
+    <div class="action-bar">
+        <button class="action-btn" onclick="downloadPDF()">
+            <svg fill="currentColor" viewBox="0 0 20 20">
+                <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/>
+            </svg>
+            Download PDF
+        </button>
+        <button class="action-btn" onclick="window.print()">
+            <svg fill="currentColor" viewBox="0 0 20 20">
+                <path d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z"/>
+            </svg>
+            Print
+        </button>
+        <button class="action-btn" onclick="window.location.href='/'">
+            <svg fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+            </svg>
+            New Paper
+        </button>
+    </div>
+
+    <script>
+        // Load paper data from localStorage
+        function loadPaper() {
+            const paperData = localStorage.getItem("paper_output");
+
+            if (!paperData) {
+                alert("No paper data found! Redirecting to home...");
+                window.location.href = "/";
+                return;
+            }
+
+            const data = JSON.parse(paperData);
+
+            // Populate all fields
+            document.getElementById('paperTitle').textContent = data.title || "Untitled Research Paper";
+            document.getElementById('paperField').textContent = data.field || "General";
+            document.getElementById('paperLevel').textContent = data.level || "Academic";
+
+            document.getElementById('abstractContent').textContent = data.abstract || "No abstract available.";
+            document.getElementById('introductionContent').textContent = data.introduction || "No introduction available.";
+            document.getElementById('literatureContent').textContent = data.literature_review || "No literature review available.";
+            document.getElementById('methodologyContent').textContent = data.methodology || "No methodology available.";
+            document.getElementById('conclusionContent').textContent = data.conclusion || "No conclusion available.";
+
+            // Keywords
+            const keywordsList = document.getElementById('keywordsList');
+            keywordsList.innerHTML = '';
+
+            if (data.keywords && data.keywords.length > 0) {
+                data.keywords.forEach(keyword => {
+                    const tag = document.createElement('span');
+                    tag.className = 'keyword-tag';
+                    tag.textContent = keyword.trim();
+                    keywordsList.appendChild(tag);
+                });
+            }
+        }
+
+        // Download PDF
+        function downloadPDF() {
+            const element = document.querySelector('.container');
+            const actionBar = document.querySelector('.action-bar');
+
+            actionBar.style.display = 'none';
+
+            const opt = {
+                margin: 10,
+                filename: 'research_paper.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                actionBar.style.display = 'flex';
+            });
+        }
+
+        // Load paper on page load
+        window.addEventListener('DOMContentLoaded', loadPaper);
+    </script>
+</body>
+</html>
+
