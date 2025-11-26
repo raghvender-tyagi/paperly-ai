@@ -4,7 +4,6 @@ from langgraph.graph import StateGraph, END, START
 from typing import TypedDict, List,Literal
 import json
 
-
 import os
 import arxiv
 from reportlab.lib.pagesizes import A4
@@ -18,7 +17,8 @@ from langchain_openai import ChatOpenAI
 
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
-ChatOpenAI.model_rebuild()
+
+
 
 llm = ChatOpenAI(
     model="gpt-4o-mini",
