@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-)#c(sey66xgdl179n62j-+tsj0%2+ino(d^rove-!m%m(&$)!e
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["paperly-ai-production.up.railway.app",]
 
 
 # Application definition
