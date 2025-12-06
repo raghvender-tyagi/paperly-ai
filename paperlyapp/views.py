@@ -66,8 +66,8 @@ def generate_paper(request):
                 "keywords": keywords
             }
 
-            # Uncomment when your graph is ready
-             try:
+            # Run the graph
+            try:
                 result = rungraph(user_input)
             except Exception as e:
                 return JsonResponse({
