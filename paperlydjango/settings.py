@@ -26,7 +26,8 @@ SECRET_KEY = 'django-insecure-)#c(sey66xgdl179n62j-+tsj0%2+ino(d^rove-!m%m(&$)!e
 DEBUG = True
 
 ALLOWED_HOSTS = [
-                "paperly-ai-production-f0c3.up.railway.app",]
+                "paperly-ai-production-f0c3.up.railway.app",
+"independent-emotion-production.up.railway.app",]
 CSRF_TRUSTED_ORIGINS = [
     'https://paperly-ai-production-f0c3.up.railway.app'
 ]
