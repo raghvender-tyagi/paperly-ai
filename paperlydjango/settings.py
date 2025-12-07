@@ -35,7 +35,8 @@ ALLOWED_HOSTS = [RENDER_HOST] if RENDER_HOST else ['localhost', '127.0.0.1']
 if not DEBUG:
     ALLOWED_HOSTS.extend([
         "paperly-ai-production-f0c3.up.railway.app",
-        "independent-emotion-production.up.railway.app"
+        "independent-emotion-production.up.railway.app",
+        "paperly-ai.onrender.com"
     ])
 
 # CSRF trusted origins
@@ -44,6 +45,7 @@ if RENDER_HOST:
     CSRF_TRUSTED_ORIGINS.append('https://' + RENDER_HOST)
 if not DEBUG:
     CSRF_TRUSTED_ORIGINS.append('https://paperly-ai-production-f0c3.up.railway.app')
+    CSRF_TRUSTED_ORIGINS.append('https://paperly-ai.onrender.com')
 
 
 # Application definition
@@ -79,7 +81,9 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 ROOT_URLCONF = 'paperlydjango.urls'
 
