@@ -70,6 +70,9 @@ def generate_paper(request):
             try:
                 result = rungraph(user_input)
             except Exception as e:
+                import traceback
+                print(f"ERROR in rungraph: {str(e)}")
+                print(traceback.format_exc())
                 return JsonResponse({
                     "status": "error",
                     "message": "rungraph failed",

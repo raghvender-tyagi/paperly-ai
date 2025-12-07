@@ -465,7 +465,7 @@ def rungraph(user_input):
         "keywords": user_input["keywords"],
         "level": user_input["level"],
         "objectives": user_input["objectives"],
-        "novelty": novelty,
+        "novelty": novelty.content,
         "introduction": "",
         "literature_review": "",
         "methodology": "",
