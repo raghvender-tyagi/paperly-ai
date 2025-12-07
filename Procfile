@@ -1,1 +1,1 @@
-web: gunicorn paperlydjango.wsgi:application --timeout 600 --workers 1 --threads 4
+web: gunicorn paperlydjango.wsgi:application --config gunicorn.conf.py
