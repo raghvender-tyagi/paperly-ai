@@ -390,69 +390,69 @@ def rungraph(user_input):
 
     graph = StateGraph(MainState)
 
-    graph.add_node("introduction", generate_introduction)
+    graph.add_node("gen_introduction", generate_introduction)
     graph.add_node("critic_intro", critic)
 
-    graph.add_node("literature_review", generate_literature_review)
+    graph.add_node("gen_literature_review", generate_literature_review)
     graph.add_node("critic_lit", critic)
 
-    graph.add_node("methodology", generate_methodology)
+    graph.add_node("gen_methodology", generate_methodology)
     graph.add_node("critic_method", critic)
 
-    graph.add_node("conclusion", generate_conclusion)
+    graph.add_node("gen_conclusion", generate_conclusion)
     graph.add_node("critic_concl", critic)
 
-    graph.add_node("abstract", generate_abstract)
+    graph.add_node("gen_abstract", generate_abstract)
 
     graph.add_node("critic_abstract", critic)
 
-    graph.add_edge(START, "introduction")
-    graph.add_edge("introduction", "critic_intro")
+    graph.add_edge(START, "gen_introduction")
+    graph.add_edge("gen_introduction", "critic_intro")
     graph.add_conditional_edges(
         "critic_intro",
         route_after_intro,
         {
-            "introduction": "introduction",
-            "literature_review": "literature_review"
+            "introduction": "gen_introduction",
+            "literature_review": "gen_literature_review"
         }
     )
 
-    graph.add_edge("literature_review", "critic_lit")
+    graph.add_edge("gen_literature_review", "critic_lit")
     graph.add_conditional_edges(
         "critic_lit",
         route_after_lit,
         {
-            "literature_review": "literature_review",
-            "methodology": "methodology"
+            "literature_review": "gen_literature_review",
+            "methodology": "gen_methodology"
         }
     )
 
-    graph.add_edge("methodology", "critic_method")
+    graph.add_edge("gen_methodology", "critic_method")
     graph.add_conditional_edges(
         "critic_method",
         route_after_method,
         {
-            "methodology": "methodology",
-            "conclusion": "conclusion"
+            "methodology": "gen_methodology",
+            "conclusion": "gen_conclusion"
         }
     )
 
-    graph.add_edge("conclusion", "critic_concl")
+    graph.add_edge("gen_conclusion", "critic_concl")
     graph.add_conditional_edges(
         "critic_concl",
         route_after_concl,
         {
-            "conclusion": "conclusion",
-            "abstract": "abstract"
+            "conclusion": "gen_conclusion",
+            "abstract": "gen_abstract"
         }
     )
 
-    graph.add_edge("abstract", "critic_abstract")
+    graph.add_edge("gen_abstract", "critic_abstract")
     graph.add_conditional_edges(
         "critic_abstract",
         route_after_abstract,
         {
-            "abstract": "abstract",
+            "abstract": "gen_abstract",
             "__end__": END
         }
     )
@@ -465,7 +465,7 @@ def rungraph(user_input):
         "keywords": user_input["keywords"],
         "level": user_input["level"],
         "objectives": user_input["objectives"],
-        "novelty": novelty,
+        "novelty": novelty.content,
         "introduction": "",
         "literature_review": "",
         "methodology": "",
