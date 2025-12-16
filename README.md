@@ -3,7 +3,7 @@ PaperlyAI is an intelligent, agentic AI system designed to automatically generat
 Features
 ////////
 Autonomous Topic Understanding
-Understands the problem statement and generates a complete outline.
+Understands the problem statement and generates a complete outline of the problem.
 
 Automated Literature Review
 Searches scientific papers using APIs (arXiv, Semantic Scholar).
@@ -124,7 +124,7 @@ Each section follows the same workflow: **Generate → Critique → Route (Retry
 ## RETURN result → MainState
 
 ✓ title (auto-generated)
-✓ literature review
+✓ literature review 
 ✓ abstract
 ✓ methodology
 ✓ introduction
