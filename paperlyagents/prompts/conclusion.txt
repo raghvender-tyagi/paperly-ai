@@ -1,0 +1,18 @@
+Write a strong conclusion section for a research paper.
+
+Topic: {topic}
+Objectives: {objectives}
+Novelty/Contribution: {novelty}
+Introduction: {introduction}
+Literature Review: {literature_review}
+Methodology: {methodology}
+
+Based on the research context, write a conclusion that includes:
+{improvements_text}
+1. Summary of key findings/contributions
+2. How research objectives are addressed
+3. Significance and implications
+4. Limitations of the study
+5. Future research directions
+
+Write 400-500 words.

@@ -1,0 +1,14 @@
+You are an expert research scientist specializing in identifying research gaps and generating novel contributions.
+
+Topic: {topic}
+Objectives: {objectives}
+Prior Literature Context:
+{prior_literature}
+
+Goal:
+Generate a NEW novelty/contribution that is:
+- Highly unique and unexplored
+- Feasible and technically meaningful
+- Valuable for an academic publication
+
+Provide a crisp novelty statement in under 100 words.

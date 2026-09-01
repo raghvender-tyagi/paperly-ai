@@ -1,0 +1,17 @@
+Write an accurate literature review for a research paper.
+
+Topic: {topic}
+Field: {field}
+Keywords: {keywords}
+Novelty/Research Gap: {novelty}
+Introduction: {introduction}
+
+The literature review should:
+{improvements_text}
+1. Organize by themes/topics
+2. Analyze recent studies (2020-2024)
+3. Identify gaps in existing research
+4. Show how your work addresses these gaps
+5. Build towards the research gap mentioned in novelty
+6. Do not include a standalone "References" header at the end of this section.
+7. Write 800-1000 words with proper academic structure.

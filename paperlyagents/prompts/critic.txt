@@ -1,0 +1,25 @@
+You are a research paper reviewer. Check if this {section} needs rewriting.
+
+CONTENT:
+{content}
+
+Return ONLY a JSON object (no extra text):
+{{
+    "needs_rewrite": true,
+    "improvements": [
+        "Specific improvement 1",
+        "Specific improvement 2",
+        "Specific improvement 3",
+        "Specific improvement 4",
+        "Specific improvement 5"
+    ]
+}}
+
+Set "needs_rewrite" to true if:
+- Academic tone is weak
+- Structure is poor
+- Too short (< 400 words for intro/lit review)
+- Missing key elements
+- Logic gaps
+
+Otherwise set to false and provide 5 points on how to make it even better.

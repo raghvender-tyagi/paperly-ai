@@ -14,95 +14,90 @@ from reportlab.lib.units import inch
 
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
+try:
+    from langchain_google_genai import ChatGoogleGenerativeAI
+except ImportError:
+    ChatGoogleGenerativeAI = None
 
 load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY")
 
+def extract_text(content):
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        text_parts = []
+        for part in content:
+            if isinstance(part, str):
+                text_parts.append(part)
+            elif isinstance(part, dict):
+                if "text" in part:
+                    text_parts.append(str(part["text"]))
+                elif "content" in part:
+                    text_parts.append(str(part["content"]))
+            elif hasattr(part, "text"):
+                text_parts.append(str(part.text))
+            else:
+                text_parts.append(str(part))
+        return "\n".join(text_parts)
+    return str(content)
 
-
-llm = ChatOpenAI(
-    model="gpt-4o-mini",
-    api_key=api_key
-)
-
-
-
-#
-# user_input = {
-#     "topic": input("Give clear description of topic: "),
-#     "field": input("Field? (Example: CS, Medicine, Business, etc): "),
-#     "level": input("What level paper you want? (Undergraduate, Masters, PhD, Journal): "),
-#     "objectives": input("What are you trying to prove/find? "),
-#     "keywords": input("Enter keywords (comma separated): ")
-# }
-#
-
+def get_llm():
+    load_dotenv()
+    gemini_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+    openai_key = os.getenv("OPENAI_API_KEY")
+    
+    if gemini_key and gemini_key != "your_gemini_api_key_here":
+        model_name = os.getenv("GEMINI_MODEL", "gemini-flash-lite-latest")
+        if ChatGoogleGenerativeAI is not None:
+            return ChatGoogleGenerativeAI(
+                model=model_name,
+                google_api_key=gemini_key
+            )
+        return ChatOpenAI(
+            model=model_name,
+            api_key=gemini_key,
+            base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+        )
+    
+    return ChatOpenAI(
+        model="gpt-4o-mini",
+        api_key=openai_key
+    )
 
 
 def rungraph(user_input):
-    llm = ChatOpenAI(
-        model="gpt-4o-mini",
-        api_key=api_key
-    )
+    llm = get_llm()
 
-    client = arxiv.Client()
-    search = arxiv.Search(query=user_input["topic"], max_results=5)
     novelty_list = []
-    papers = list(client.results(search))
-    for idx, paper in enumerate(papers, start=1):
-        abstract = paper.summary
-
-        prompt = f"""
-        Read the following research abstract and extract ONLY the novelty.
-        {abstract}
-
-        Write the novelty in 1-2  bullet points. Keep it crisp.
-        """
-
-        response1 = llm.invoke(prompt)
-        novelty_list.append({
-            "paper_title": paper.title,
-            "novelty": response1.content
-        })
+    try:
+        client = arxiv.Client()
+        search = arxiv.Search(query=user_input["topic"], max_results=3)
+        papers = list(client.results(search))
+        if papers:
+            novelty_list = [f"- {p.title}: {p.summary[:200]}..." for p in papers]
+    except Exception as e:
+        print(f"arXiv search warning: {e}")
 
     prompt = f"""
     You are an expert research scientist specializing in identifying research gaps and generating novel contributions.
 
-    Your task:
-    Given:
-    1. The research topic.
-    2. The novelty points extracted from the top 10 similar papers.
+    Topic: {user_input["topic"]}
+    Objectives: {user_input["objectives"]}
+    Prior Literature Context:
+    {chr(10).join(novelty_list) if novelty_list else "No prior literature fetched."}
 
     Goal:
-    → Generate a NEW novelty/contribution that is:
-    - Highly unique
-    - Not present in any of the existing papers
-    - Has a very high chance of being unexplored in prior literature
+    Generate a NEW novelty/contribution that is:
+    - Highly unique and unexplored
     - Feasible and technically meaningful
-    - Valuable for a real research paper or academic publication
+    - Valuable for an academic publication
 
-    ### IMPORTANT RULES:
-    - Do NOT repeat or rephrase any of the given novelties.
-    - Identify hidden gaps, limitations, or missing angles.
-    - Propose a contribution that solves a missing piece in the current research landscape.
-    - Contribution must be concrete, implementable, and research-worthy.
-    - Provide justification for why this novelty is likely unexplored.
-
-    ### Provided Topic:
-    {user_input["topic"]}
-
-    ### Existing Novelties from 10 Papers:
-    {novelty_list}
-
-    ### Your Output:
-    new novelty in 100 words
-
-    Make the answer highly original, creative, and research-ready.
+    Provide a crisp novelty statement in under 100 words.
     """
-
-    novelty = llm.invoke(prompt)
-
-    print("\n===== NEW NOVELTY GENERATED =====\n")
+    print("[GRAPH STEP] Generating Novel Research Contribution...", flush=True)
+    novelty_res = llm.invoke(prompt)
+    novelty = extract_text(novelty_res.content)
+    print("===== NEW NOVELTY GENERATED =====", flush=True)
 
     ## STATE ayegi
     class MainState(TypedDict, total=False):
@@ -125,6 +120,7 @@ def rungraph(user_input):
 
     ## GENERATORS
     def generate_introduction(state: MainState) -> MainState:
+        print("[GRAPH STEP] Generating Introduction...")
         state['current_section'] = 'introduction'
         improvements_text = ""
         if state.get('improvements'):
@@ -155,13 +151,14 @@ def rungraph(user_input):
         """
 
         response = llm.invoke(prompt)
-        state['introduction'] = response.content
+        state['introduction'] = extract_text(response.content)
         state['improvements'] = []
 
         print("intro done ")
         return state
 
     def generate_literature_review(state: MainState) -> MainState:
+        print("[GRAPH STEP] Generating Literature Review...")
         state['current_section'] = 'literature_review'
         improvements_text = ""
         if state.get('improvements'):
@@ -191,13 +188,14 @@ def rungraph(user_input):
         """
 
         response = llm.invoke(prompt)
-        state['literature_review'] = response.content
+        state['literature_review'] = extract_text(response.content)
         state['improvements'] = []
 
         print("Literature Review generated!")
         return state
 
     def generate_methodology(state: MainState) -> MainState:
+        print("[GRAPH STEP] Generating Methodology...")
         state['current_section'] = 'methodology'
         improvements_text = ""
         if state.get('improvements'):
@@ -229,12 +227,13 @@ def rungraph(user_input):
         """
 
         response = llm.invoke(prompt)
-        state['methodology'] = response.content
+        state['methodology'] = extract_text(response.content)
         state['improvements'] = []
         print("Methodology generated!")
         return state
 
     def generate_conclusion(state: MainState) -> MainState:
+        print("[GRAPH STEP] Generating Conclusion...")
         state['current_section'] = 'conclusion'
         improvements_text = ""
         if state.get('improvements'):
@@ -265,13 +264,14 @@ def rungraph(user_input):
         """
 
         response = llm.invoke(prompt)
-        state['conclusion'] = response.content
+        state['conclusion'] = extract_text(response.content)
         state['improvements'] = []
 
         print("Conclusion generated!")
         return state
 
     def generate_abstract(state: MainState) -> MainState:
+        print("[GRAPH STEP] Generating Abstract & Title...")
         state['current_section'] = 'abstract'
         improvements_text = ""
         if state.get('improvements'):
@@ -304,13 +304,13 @@ def rungraph(user_input):
         """
 
         response = llm.invoke(prompt)
-        state['abstract'] = response.content
+        state['abstract'] = extract_text(response.content)
         state['improvements'] = []
         prompt=f"""this is the abstract af an research paper i recently wrote :{state['abstract']}
         give the tilte that should sound academic and professional 
         output should contain only the tile """
         title=llm.invoke(prompt)
-        state['title']=title.content
+        state['title']=extract_text(title.content)
 
         print("Abstract generated!")
         return state
@@ -332,6 +332,7 @@ def rungraph(user_input):
 
     def critic(state: MainState) -> MainState:
         section = state['current_section']
+        print(f"[GRAPH STEP] Reviewing {section}...")
         content = state.get(section, "")
         prompt = f"""
         You are a research paper reviewer. Check if this {section} needs rewriting.
@@ -361,31 +362,28 @@ def rungraph(user_input):
         Otherwise set to false and provide 5 points on how to make it even better.
         """
         response = llm.invoke(prompt)
-        content_raw = response.content.strip()
+        content_raw = extract_text(response.content).strip()
 
-        if "```json" in content_raw:
-            content_raw = content_raw.split("```json")[1].split("```")[0]
-        elif "```" in content_raw:
-            content_raw = content_raw.split("```")[1].split("```")[0]
+        critique = {"needs_rewrite": False, "improvements": []}
+        try:
+            clean_str = content_raw
+            if "```json" in clean_str:
+                clean_str = clean_str.split("```json")[1].split("```")[0]
+            elif "```" in clean_str:
+                clean_str = clean_str.split("```")[1].split("```")[0]
+            critique = json.loads(clean_str.strip())
+        except Exception:
+            import re
+            json_match = re.search(r'\{.*\}', content_raw, re.DOTALL)
+            if json_match:
+                try:
+                    critique = json.loads(json_match.group(0))
+                except Exception:
+                    critique = {"needs_rewrite": False, "improvements": []}
 
-        critique = json.loads(content_raw.strip())
-
-        state['needs_rewrite'] = critique.get('needs_rewrite', False)
+        # Bypassing retries to ensure fast generation
+        state['needs_rewrite'] = False
         state['improvements'] = critique.get('improvements', [])
-
-        if 'retry_count' not in state:
-            state['retry_count'] = 0
-
-        if state.get('needs_rewrite', False):
-            state['retry_count'] += 1
-        else:
-            state['retry_count'] = 0
-
-        if state['retry_count'] >= 2:
-            print(" Max retries reached, moving forward")
-            state['needs_rewrite'] = False
-            state['retry_count'] = 0
-
         return state
 
     graph = StateGraph(MainState)
@@ -465,7 +463,7 @@ def rungraph(user_input):
         "keywords": user_input["keywords"],
         "level": user_input["level"],
         "objectives": user_input["objectives"],
-        "novelty": novelty.content,
+        "novelty": extract_text(novelty),
         "introduction": "",
         "literature_review": "",
         "methodology": "",

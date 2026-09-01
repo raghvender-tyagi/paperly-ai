@@ -1,0 +1,19 @@
+Write a detailed methodology section for a research paper.
+
+Topic: {topic}
+Field: {field}
+Objectives: {objectives}
+Level: {level}
+Introduction: {introduction}
+Literature Review: {literature_review}
+
+The methodology should include:
+{improvements_text}
+1. Research design (qualitative/quantitative/mixed)
+2. Data collection methods
+3. Sample size and selection criteria
+4. Tools and techniques to be used
+5. Data analysis methods
+6. Justification for chosen methods
+
+Be specific and detailed. Write 600-800 words.

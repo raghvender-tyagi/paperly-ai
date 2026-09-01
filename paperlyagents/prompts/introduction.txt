@@ -1,0 +1,19 @@
+Write a detailed introduction section for a research paper.
+
+Topic: {topic}
+Field: {field}
+Level: {level}
+Objectives: {objectives}
+Novelty: {novelty}
+Keywords: {keywords}
+
+The introduction should include:
+{improvements_text}
+1. Background and context
+2. Problem statement
+3. Research gap (based on novelty)
+4. Research objectives
+5. Paper structure overview
+
+Everything should align with given data.
+Write 500-700 words in academic tone.

@@ -335,7 +335,7 @@
     "✅ Finalizing research paper..."
 ];
 
-        // Form submission
+        // Form submission & Real-time status polling
         form.addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -350,54 +350,63 @@
             const loadingOverlay = document.getElementById('loadingOverlay');
             const stepsElement = document.getElementById('loadingSteps');
             loadingOverlay.style.display = 'flex';
+            stepsElement.textContent = "🚀 Submitting research paper request...";
 
-            // Animate loading steps
-            let step = 0;
-            const stepInterval = setInterval(() => {
-                if (step < loadingSteps.length) {
-                    stepsElement.textContent = loadingSteps[step];
-                    step++;
-                }
-            }, 10000);
+            // Get CSRF token if present
+            const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+            const headers = { "Content-Type": "application/json" };
+            if (csrfInput) headers["X-CSRFToken"] = csrfInput.value;
 
-            // Get CSRF token
-            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
-            // Backend call
+            // Submit job request
             fetch("/generate/", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": csrftoken
-                
-                },
+                headers: headers,
                 body: JSON.stringify(formData)
             })
             .then(res => res.json())
             .then(data => {
-                clearInterval(stepInterval);
-                console.log("Response:", data);
-
-                setTimeout(() => {
+                if (data.status === "queued" && data.request_id) {
+                    pollStatus(data.request_id);
+                } else {
                     loadingOverlay.style.display = 'none';
-
-                    if (data.status === "success") {
-                        // Save output to localStorage
-                        localStorage.setItem("paper_output", JSON.stringify(data.output));
-                        // Redirect to result page
-                        window.location.href = "/result/";
-                    } else {
-                        alert("Error: " + data.message);
-                    }
-                }, 1000);
+                    alert("Error submitting request: " + (data.message || "Unknown error"));
+                }
             })
             .catch(err => {
-                clearInterval(stepInterval);
-                console.error("Error:", err);
+                console.error("Submission Error:", err);
                 loadingOverlay.style.display = 'none';
-                alert("Server error occurred! " + err);
+                alert("Server error occurred while submitting request: " + err);
             });
         });
+
+        function pollStatus(requestId) {
+            const stepsElement = document.getElementById('loadingSteps');
+            
+            const interval = setInterval(async () => {
+                try {
+                    const res = await fetch(`/status/${requestId}/`);
+                    const data = await res.json();
+
+                    if (data.current_section) {
+                        stepsElement.textContent = `⚡ Section: ${data.current_section}...`;
+                    }
+
+                    if (data.status === "done") {
+                        clearInterval(interval);
+                        stepsElement.textContent = "✅ Generation Complete! Redirecting...";
+                        setTimeout(() => {
+                            window.location.href = `/result/${requestId}/`;
+                        }, 800);
+                    } else if (data.status === "failed") {
+                        clearInterval(interval);
+                        document.getElementById('loadingOverlay').style.display = 'none';
+                        alert("Paper generation failed: " + (data.error || "Unknown error"));
+                    }
+                } catch (err) {
+                    console.error("Polling error:", err);
+                }
+            }, 2000);
+        }
     </script>
 </body>
 </html>
