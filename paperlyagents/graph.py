@@ -31,21 +31,31 @@ class MainState(TypedDict, total=False):
     retry_count: int
 
 
+def fetch_arxiv_papers(query):
+    try:
+        client = arxiv.Client(page_size=3, delay_seconds=0.5, num_retries=1)
+        search = arxiv.Search(query=query, max_results=3)
+        papers = list(client.results(search))
+        if papers:
+            return [f"- {p.title}: {p.summary[:200]}..." for p in papers]
+    except Exception as e:
+        print(f"arXiv search timeout/error: {e}")
+    return []
+
+
 def rungraph(user_input, progress_callback=None):
     llm = get_llm()
 
     if progress_callback:
-        progress_callback("novelty")
+        progress_callback("Analyzing prior research & novelty")
 
     novelty_list = []
-    try:
-        client = arxiv.Client()
-        search = arxiv.Search(query=user_input["topic"], max_results=3)
-        papers = list(client.results(search))
-        if papers:
-            novelty_list = [f"- {p.title}: {p.summary[:200]}..." for p in papers]
-    except Exception as e:
-        print(f"arXiv search warning: {e}")
+    with ThreadPoolExecutor(max_workers=1) as arxiv_executor:
+        future = arxiv_executor.submit(fetch_arxiv_papers, user_input["topic"])
+        try:
+            novelty_list = future.result(timeout=2.0)
+        except Exception:
+            print("arXiv query timed out after 2 seconds, proceeding with default context.")
 
     template = load_prompt("novelty")
     prompt = template.format(
@@ -55,7 +65,7 @@ def rungraph(user_input, progress_callback=None):
     )
 
     novelty_res = llm.invoke(prompt)
-    novelty = extract_text(novelty_res.content)
+    novelty_text = extract_text(novelty_res.content)
 
     state = {
         "topic": user_input["topic"],
@@ -63,51 +73,57 @@ def rungraph(user_input, progress_callback=None):
         "keywords": user_input["keywords"],
         "level": user_input["level"],
         "objectives": user_input["objectives"],
-        "novelty": extract_text(novelty),
+        "novelty": novelty_text,
         "introduction": "",
         "literature_review": "",
         "methodology": "",
         "conclusion": "",
         "abstract": "",
+        "title": user_input["topic"],
         "retry_count": 0,
         "needs_rewrite": False,
         "improvements": []
     }
 
     if progress_callback:
-        progress_callback("generating sections (parallel)")
+        progress_callback("Generating all paper sections in parallel")
 
     def run_intro():
-        st = dict(state)
-        res = generate_introduction(st, llm)
-        return res.get("introduction", "")
+        return generate_introduction(state, llm)
 
     def run_lit():
-        st = dict(state)
-        res = generate_literature_review(st, llm)
-        return res.get("literature_review", "")
+        return generate_literature_review(state, llm)
 
     def run_method():
-        st = dict(state)
-        res = generate_methodology(st, llm)
-        return res.get("methodology", "")
+        return generate_methodology(state, llm)
 
-    with ThreadPoolExecutor(max_workers=3) as executor:
+    def run_concl():
+        return generate_conclusion(state, llm)
+
+    def run_abstr():
+        return generate_abstract(state, llm)
+
+    with ThreadPoolExecutor(max_workers=5) as executor:
         f_intro = executor.submit(run_intro)
         f_lit = executor.submit(run_lit)
         f_method = executor.submit(run_method)
+        f_concl = executor.submit(run_concl)
+        f_abstr = executor.submit(run_abstr)
 
         state["introduction"] = f_intro.result()
         state["literature_review"] = f_lit.result()
         state["methodology"] = f_method.result()
+        state["conclusion"] = f_concl.result()
+        state["abstract"] = f_abstr.result()
 
-    if progress_callback:
-        progress_callback("conclusion")
-    state = generate_conclusion(state, llm)
-
-    if progress_callback:
-        progress_callback("abstract")
-    state = generate_abstract(state, llm)
+    # Generate academic title from abstract
+    try:
+        title_prompt = f"Topic: {state['topic']}\nAbstract: {state['abstract'][:300]}\nGenerate a concise academic title. Output ONLY the title."
+        title_res = llm.invoke(title_prompt)
+        state["title"] = extract_text(title_res.content).strip().strip('"')
+    except Exception:
+        state["title"] = state["topic"]
 
     return state
+
 

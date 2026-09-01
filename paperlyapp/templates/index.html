@@ -186,40 +186,113 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 100;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(24px);
+            z-index: 1000;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
 
-        .loading-content {
+        .loading-card {
+            background: rgba(20, 20, 28, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 28px;
+            padding: 48px 40px;
+            max-width: 480px;
+            width: 100%;
             text-align: center;
+            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.8), 0 0 40px rgba(138, 43, 226, 0.15);
+            animation: modalFadeIn 0.4s ease-out;
         }
 
-        .loader {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 30px;
-            border: 3px solid transparent;
-            border-top-color: #fff;
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .loader-wrapper {
+            position: relative;
+            width: 84px;
+            height: 84px;
+            margin: 0 auto 28px;
+        }
+
+        .loader-ring {
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
-            animation: rotate 1s linear infinite;
+            border: 3px solid rgba(255, 255, 255, 0.08);
+            border-top-color: #a855f7;
+            border-right-color: #6366f1;
+            animation: spinRing 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
         }
 
-        @keyframes rotate {
+        .loader-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 44px;
+            height: 44px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: pulseGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes spinRing {
             to { transform: rotate(360deg); }
         }
 
-        .loading-text {
-            color: #fff;
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 10px;
+        @keyframes pulseGlow {
+            0%, 100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
         }
 
-        .loading-steps {
-            color: #666;
-            font-size: 20px;
+        .loading-title {
+            color: #ffffff;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(168, 85, 247, 0.12);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 20px;
+            padding: 8px 18px;
+            color: #e9d5ff;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .status-badge-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #c084fc;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #c084fc;
+            animation: blinkDot 1s infinite alternate;
+        }
+
+        @keyframes blinkDot {
+            from { opacity: 0.3; }
+            to { opacity: 1; }
+        }
+
+        .loading-subtitle {
+            color: #94a3b8;
+            font-size: 13px;
+            letter-spacing: 0.5px;
         }
     </style>
 </head>
@@ -286,12 +359,19 @@
         </form>
     </div>
 
+    <!-- Redesigned Glassmorphic Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-content">
-            <div class="loader"></div>
-            <div class="loading-text">Generating Your Research Paper changed </div>
-            <div class="loading-steps" id="loadingSteps">Analyzing topic...</div>
-            <div class="loading-text"> hello <div>
+        <div class="loading-card">
+            <div class="loader-wrapper">
+                <div class="loader-ring"></div>
+                <div class="loader-glow"></div>
+            </div>
+            <div class="loading-title">Generating Research Paper</div>
+            <div class="status-badge">
+                <span class="status-badge-dot"></span>
+                <span id="loadingSteps">Initializing paper generation pipeline...</span>
+            </div>
+            <div class="loading-subtitle">🚀 Parallel AI Agents are executing all sections...</div>
         </div>
     </div>
 
@@ -314,27 +394,6 @@
             input.addEventListener('input', updateProgress);
         });
 
-        // Loading steps
-        const loadingSteps = [
-    "🔍 Searching relevant papers from arXiv...",
-    "📄 Fetching most relevent research papers...",
-    "🧠 Extracting novelty from those papers",
-
-    "💡 Analyzing research gaps...",
-    "✨ Generating unique novelty contribution...",
-    "📝 Writing Introduction section...",
-    "🔎 Reviewing Introduction quality...",
-    "📚 Crafting Literature Review...",
-    "🔎 Reviewing Literature Review quality...",
-    "🔬 Designing Methodology section...",
-    "🔎 Reviewing Methodology quality...",
-    "🎯 Writing Conclusion section...",
-    "🔎 Reviewing Conclusion quality...",
-    "📋 Generating Abstract...",
-    "🏷️ Creating paper title...",
-    "✅ Finalizing research paper..."
-];
-
         // Form submission & Real-time status polling
         form.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -350,7 +409,7 @@
             const loadingOverlay = document.getElementById('loadingOverlay');
             const stepsElement = document.getElementById('loadingSteps');
             loadingOverlay.style.display = 'flex';
-            stepsElement.textContent = "🚀 Submitting research paper request...";
+            stepsElement.textContent = "Submitting research paper request...";
 
             // Get CSRF token if present
             const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
@@ -388,7 +447,7 @@
                     const data = await res.json();
 
                     if (data.current_section) {
-                        stepsElement.textContent = `⚡ Section: ${data.current_section}...`;
+                        stepsElement.textContent = `${data.current_section}...`;
                     }
 
                     if (data.status === "done") {
@@ -396,7 +455,7 @@
                         stepsElement.textContent = "✅ Generation Complete! Redirecting...";
                         setTimeout(() => {
                             window.location.href = `/result/${requestId}/`;
-                        }, 800);
+                        }, 500);
                     } else if (data.status === "failed") {
                         clearInterval(interval);
                         document.getElementById('loadingOverlay').style.display = 'none';
@@ -405,8 +464,9 @@
                 } catch (err) {
                     console.error("Polling error:", err);
                 }
-            }, 2000);
+            }, 1000);
         }
     </script>
+
 </body>
 </html>
